@@ -1,0 +1,1 @@
+A python package containing two statistical tests for HWE testing: Gibbs Sampling test and a modified Chi Squared test that handles ambiguity
