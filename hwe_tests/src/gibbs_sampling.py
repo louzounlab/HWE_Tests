@@ -253,6 +253,18 @@ def perform_experiment(alleles_count,
         if sum_current >= list_probabilities[0]:
             bigger_counter += 1
 
+        # if plot_index is zero we have only one plot, if bigger than zero we have subplots.
+        if plot_index > 0:
+            plt.subplot(3, 2, plot_index)
+            plt.xticks([])
+            if (plot_index % 2) == 0:
+                plt.yticks([])
+            ax = plt.gca()
+            ax.tick_params(axis='y', labelsize=10)
+
+        if plot_index >= 0:
+            plt.plot(list(range(start_from, len(values) + start_from)), values, color='black')
+
     result = bigger_counter / (len(list_probabilities) - start_from)
     p_value = 1.0 - 2 * abs(max(0.5, result) - 0.5)
     return p_value
@@ -260,7 +272,7 @@ def perform_experiment(alleles_count,
 
 # here is the full gibbs sampling algorithm.
 # we use the same observations 10 times and return the mean result
-def full_algorithm(observations):
+def full_algorithm(observations, should_save_plot=False):
     alleles_count = observations.shape[0]
     population_amount_calculated = np.sum(observations) # check this is integer
 
@@ -296,17 +308,30 @@ def full_algorithm(observations):
     results = []
 
     for experiment_num in range(experiments_amount):
-        result = \
-            perform_experiment(alleles_count=alleles_count,
-                               population_amount_calculated=population_amount_calculated,
-                               alleles_probabilities=alleles_probabilities,
-                               probabilities=probabilities,
-                               observed=observed_copy,
-                               observed_cdf=observed_cdf_copy)
+        if should_save_plot:
+            plt.subplot(3, 2, 1)
+            result = \
+                perform_experiment(alleles_count=alleles_count,
+                                   population_amount_calculated=population_amount_calculated,
+                                   alleles_probabilities=alleles_probabilities,
+                                   probabilities=probabilities,
+                                   observed=observed_copy,
+                                   observed_cdf=observed_cdf_copy,
+                                   plot_index=experiment_num + 1)
+        else:
+            result = \
+                perform_experiment(alleles_count=alleles_count,
+                                   population_amount_calculated=population_amount_calculated,
+                                   alleles_probabilities=alleles_probabilities,
+                                   probabilities=probabilities,
+                                   observed=observed_copy,
+                                   observed_cdf=observed_cdf_copy)
         results.append(result)
         # initialize observed_copy, copy from observed matrix
         np.copyto(observed_copy, observations)
         np.copyto(observed_cdf_copy, observed_cdf)
 
+    if should_save_plot:
+        plt.savefig(f'gibbs_sampling_plot', pad_inches=0.2, bbox_inches="tight")
     mean_result = np.mean(results)
     return mean_result

@@ -62,6 +62,7 @@ def full_algorithm(file_path):
             id = lst[0]
             allele_1 = int(lst[1])
             allele_2 = int(lst[2])
+            allele_1, allele_2 = min(allele_1, allele_2), max(allele_1, allele_2)
             probability = float(lst[3])
 
             if id not in id_to_index:
@@ -94,6 +95,7 @@ def full_algorithm(file_path):
             id = lst[0]
             allele_1 = int(lst[1])
             allele_2 = int(lst[2])
+            allele_1, allele_2 = min(allele_1, allele_2), max(allele_1, allele_2)
             probability = float(lst[3])
 
             id_index = id_to_index[id]
