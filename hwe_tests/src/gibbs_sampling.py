@@ -271,8 +271,18 @@ def perform_experiment(alleles_count,
 
 
 # here is the full gibbs sampling algorithm.
-# we use the same observations 10 times and return the mean result
+# we use the same observations 5 times and return the mean result
 def full_algorithm(observations, should_save_plot=False):
+    """
+    Gibbs Sampling Algorithm.
+
+    Performs perturbations on the observations in order to approach HWE
+    :param observations: A numpy square matrix where a_ij is the amount of donors
+    observed alleles i,j
+    :param should_save_plot: Either boolean or string, if its True then plot of the perturbations is saved
+    and if its a string then a plot with the given string name is saved
+    :return: A p-value under the null Hypothesis that observations are distributed around HWE
+    """
     alleles_count = observations.shape[0]
     population_amount_calculated = np.sum(observations) # check this is integer
 
@@ -332,6 +342,9 @@ def full_algorithm(observations, should_save_plot=False):
         np.copyto(observed_cdf_copy, observed_cdf)
 
     if should_save_plot:
-        plt.savefig(f'gibbs_sampling_plot', pad_inches=0.2, bbox_inches="tight")
+        if isinstance(should_save_plot, str):
+            plt.savefig(should_save_plot, pad_inches=0.2, bbox_inches="tight")
+        else:
+            plt.savefig(f'gibbs_sampling_plot', pad_inches=0.2, bbox_inches="tight")
     mean_result = np.mean(results)
     return mean_result

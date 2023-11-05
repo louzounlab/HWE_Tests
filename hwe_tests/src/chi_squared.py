@@ -48,6 +48,14 @@ def run_experiment(alleles_count, population_amount, alleles_probabilities,
 
 
 def full_algorithm(file_path):
+    """
+        Modified Chi-Squared Algorithm.
+
+        Performs a modified Chi-Squared statistical test on ambiguous observations.
+        :param file_path: A path to a csv file with columns: 1) index or id of a donor.
+        2) first allele (integer). 3) second allele (integer). 4) probability (float).
+        :return: A p-value
+        """
     id_to_index = {}
     allele_to_index = {}
 
