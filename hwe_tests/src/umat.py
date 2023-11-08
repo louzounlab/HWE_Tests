@@ -274,17 +274,23 @@ def perform_experiment(alleles_count,
 # we use the same observations 5 times and return the mean result
 def full_algorithm(observations, should_save_plot=False):
     """
-    Gibbs Sampling Algorithm.
+    UMAT Algorithm.
 
     Performs perturbations on the observations in order to approach HWE
     :param observations: A numpy square matrix where a_ij is the amount of donors
-    observed alleles i,j
-    :param should_save_plot: Either boolean or string, if its True then plot of the perturbations is saved
-    and if its a string then a plot with the given string name is saved
-    :return: A p-value under the null Hypothesis that observations are distributed around HWE
+    observed alleles i,j.
+    :param should_save_plot: Either boolean or string, if it's True then plot of the perturbations is saved
+    (named 'umat_plot.png')
+    and if it's a string then a plot with the given string name is saved.
+    :return: A p-value under the null Hypothesis that observations are distributed around HWE.
     """
     alleles_count = observations.shape[0]
     population_amount_calculated = np.sum(observations) # check this is integer
+
+    # in case the matrix is not upper triangular
+    for i in range(alleles_count):
+        for j in range(i + 1, alleles_count):
+            observations[i, j] += observations[j, i]
 
     # observed_probabilities = np.zeros(shape=(alleles_count, alleles_count))
     # for i in range(alleles_count):
@@ -345,6 +351,6 @@ def full_algorithm(observations, should_save_plot=False):
         if isinstance(should_save_plot, str):
             plt.savefig(should_save_plot, pad_inches=0.2, bbox_inches="tight")
         else:
-            plt.savefig(f'gibbs_sampling_plot', pad_inches=0.2, bbox_inches="tight")
+            plt.savefig(f'umat_plot', pad_inches=0.2, bbox_inches="tight")
     mean_result = np.mean(results)
     return mean_result
