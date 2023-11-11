@@ -8,40 +8,30 @@ import seaborn as sns
 
 
 # need to calculate only on the upper triangle because the matrices are symmetric
-def calculate_chi_squared_value(population_amount_, counts_expected_, observed_probabilities_, correction_,
-                                cutoff):
-    value = 0
+def calculate_chi_squared_value(alleles_amount, population_amount_, alleles_probabilities, observed_probabilities, correction, cutoff):
+    value = 0.0
     amount_of_small_expected_ = 0
-    for row in range(counts_expected_.shape[0]):
-        for col in range(row, counts_expected_.shape[1]):
-            expected_ = counts_expected_[row, col]
-            observed_ = population_amount_ * observed_probabilities_[row, col]
-            variance_ = expected_
-            if expected_ < cutoff:
+    for row in range(alleles_amount):
+        for col in range(row, alleles_amount):
+            mult = 1.0
+            if row != col:
+                mult = 2.0
+            expected_val = mult * population_amount_ * alleles_probabilities[row] * alleles_probabilities[col]
+            observed_val = population_amount_ * observed_probabilities[row, col]
+            correction_val = correction[row, col]
+            variance_val = expected_val * correction_val
+            if variance_val < cutoff:
                 amount_of_small_expected_ += 1
                 continue
-            value += (1 / correction_[row, col]) * (((expected_ - observed_) ** 2) / variance_)
+            value += ((expected_val - observed_val) ** 2) / variance_val
     return value, amount_of_small_expected_
 
 
 def run_experiment(alleles_count, population_amount, alleles_probabilities,
                    observed_probabilities, correction, index_to_allele_, should_save_csv_, cutoff_value_):
-    counts_expected = np.zeros((alleles_count, alleles_count))
-    for j in range(alleles_count):
-        for k in range(j, alleles_count):
-            # EVEN
-            mult = 1
-            if k != j:
-                mult = 2
-            expected_value = mult * population_amount * alleles_probabilities[k] * alleles_probabilities[j]
-            counts_expected[k, j] = expected_value
-            counts_expected[j, k] = expected_value
 
-    chi_squared_stat, amount_of_small_expected = calculate_chi_squared_value(population_amount_=population_amount,
-                                                                             counts_expected_=counts_expected,
-                                                                             observed_probabilities_=observed_probabilities,
-                                                                             correction_=correction,
-                                                                             cutoff=cutoff_value_)
+    chi_squared_stat, amount_of_small_expected = calculate_chi_squared_value(alleles_amount=alleles_count,
+                                                                             population_amount_=population_amount,                                                                cutoff=cutoff_value_)
     couples_amount = (alleles_count * (alleles_count + 1)) / 2 - 1
     dof = couples_amount - amount_of_small_expected
 
@@ -63,16 +53,21 @@ def run_experiment(alleles_count, population_amount, alleles_probabilities,
         with open(file_name, 'w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(columns)
-            for j in range(alleles_count):
-                for k in range(j, alleles_count):
-                    # get data for current alleles
-                    first_allele = index_to_allele_[j]
-                    second_allele = index_to_allele_[k]
-                    observed = population_amount * observed_probabilities[j, k]
-                    expected = counts_expected[j, k]
-                    variance = expected * correction[j, k]
-                    # save data of current alleles as a new row in the csv
-                    writer.writerow([first_allele, second_allele, observed, expected, variance])
+
+            for i in range(alleles_count):
+                for j in range(i, alleles_count):
+                    mult = 1.0
+                    if i != j:
+                        mult = 2.0
+                    expected_val = mult * population_amount * alleles_probabilities[i] * alleles_probabilities[j]
+                    observed_val = population_amount * observed_probabilities[i, j]
+                    correction_val = correction[i, j]
+                    variance_val = expected_val * correction_val
+
+                    first_allele = index_to_allele_[i]
+                    second_allele = index_to_allele_[j]
+
+                    writer.writerow([first_allele, second_allele, observed_val, expected_val, variance_val])
 
     return p_value, chi_squared_stat, dof
 
@@ -99,6 +94,7 @@ def full_algorithm(file_path, cutoff_value=0.0, should_save_csv=False, should_sa
     id_to_index = {}
     allele_to_index = {}
     index_to_allele = {}
+    # index1_index2 -> [obs_prob, corr]
 
     # first read all the rows and get indices of ids and alleles and amounts
     with open(file_path, encoding="utf8") as infile:
@@ -134,10 +130,10 @@ def full_algorithm(file_path, cutoff_value=0.0, should_save_csv=False, should_sa
     # {p(i)}
     alleles_probabilities = np.zeros(alleles_count)
 
-    # {p(i, j)}
+    # # {p(i, j)}
     observed_probabilities = np.zeros(shape=(alleles_count, alleles_count))
-
-    # correction matrix
+    #
+    # # correction matrix
     correction = np.zeros(shape=(alleles_count, alleles_count))
 
     # calculate {p_k(i,j)}
@@ -147,13 +143,13 @@ def full_algorithm(file_path, cutoff_value=0.0, should_save_csv=False, should_sa
                 continue
             lst = line.strip('\n').split(',')
 
-            id = lst[0]
+            # id = lst[0]
             allele_1 = lst[1]
             allele_2 = lst[2]
             # allele_1, allele_2 = min(allele_1, allele_2), max(allele_1, allele_2)
             probability = float(lst[3])
 
-            id_index = id_to_index[id]
+            # id_index = id_to_index[id]
 
             allele_1_index = allele_to_index[allele_1]
             allele_2_index = allele_to_index[allele_2]
@@ -178,6 +174,14 @@ def full_algorithm(file_path, cutoff_value=0.0, should_save_csv=False, should_sa
             else:
                 correction[i, j] /= (population_amount * observed_probabilities[i, j])
 
+    # for i in range(alleles_count):
+    #     for j in range(alleles_count):
+    #         observed_probabilities[i, j] /= population_amount
+    #         if observed_probabilities[i, j] == 0:
+    #             correction[i, j] = 1.0
+    #         else:
+    #             correction[i, j] /= (population_amount * observed_probabilities[i, j])
+
     p_value, chi_squared, dof = run_experiment(alleles_count=alleles_count,
                                                population_amount=population_amount,
                                                alleles_probabilities=alleles_probabilities,
@@ -191,7 +195,7 @@ def full_algorithm(file_path, cutoff_value=0.0, should_save_csv=False, should_sa
         # save a bar plot showing for each allele its deviation from HWE
         couples_amount = int((alleles_count * (alleles_count + 1)) / 2 - 1)
         df = pd.DataFrame(index=range(couples_amount), columns=['Alleles', 'Normalized statistic', '-log_10(p_value)'])
-        logs_list = []
+        logs_list = np.zeros(shape=couples_amount)
         for i in range(alleles_count):
             # for allele i: calculate Statistic and p_value
             statistic = 0.0
@@ -201,33 +205,40 @@ def full_algorithm(file_path, cutoff_value=0.0, should_save_csv=False, should_sa
                 mult = 1
                 if t != m:
                     mult = 2
-                expected = mult * population_amount * alleles_probabilities[t] * alleles_probabilities[m]
-                if expected < cutoff_value:
+                expected_val = mult * population_amount * alleles_probabilities[t] * alleles_probabilities[m]
+                if expected_val < cutoff_value:
                     amount_of_small_expected += 1
                     continue
-                observed = population_amount * observed_probabilities[t, m]
-                statistic += (1 / correction[t, m]) * (((expected - observed) ** 2) / expected)
+                observed_val = population_amount * observed_probabilities[t, m]
+                correction_val = correction[t, m]
+                variance_val = expected_val * correction_val
+                statistic += ((expected_val - observed_val) ** 2) / variance_val
             # calculate degrees of freedom
             dof = (alleles_count - 1) - amount_of_small_expected
+
+            allele = index_to_allele[i]
+
+            if dof <= 0:
+                df.loc[i] = [allele, '?']
             # calculate p_value
             p_value = 1 - stats.chi2.cdf(x=statistic,
                                          df=dof)
             if p_value == 0.0:
-                logs_list.append('infty')
+                logs_list[i] = 'infty'
             else:
-                logs_list.append(-math.log(p_value, 10))
-            allele = index_to_allele[i]
-            df.iloc[i] = [allele, statistic / dof, 0]
+                logs_list[i] = -math.log(p_value, 10)
+            df.loc[i] = [allele, statistic / dof, 0]
 
         # sort dataframe according to p_values and take the smallest 20 statistics.
-        df = df.sort_values('Normalized statistic').head(20)
+        df = df.sort_values('Normalized statistic').head(min(alleles_count, 20))
         # we need to update the log p-values (some may be infinite, so we set them to the max value from the 20)
         logs_list_ints = [logs_list[i] for i in df.index if isinstance(logs_list[i], (int, float))]
         max_log = max(logs_list_ints)
         for i in df.index:
             if logs_list[i] == 'infty':
                 logs_list[i] = max_log
-            df.iloc[0, 2] = logs_list[i]
+            df.iloc[i, 2] = logs_list[i]
+        df = df.loc[df['-log_10(p_value)'] != '?']
         # plot the dataframe into 2 bar plots
         fig, axes = plt.subplots(1, 2)
         plt.subplot(1, 2, 1)

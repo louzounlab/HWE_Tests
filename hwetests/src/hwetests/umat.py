@@ -188,14 +188,6 @@ def perform_experiment(alleles_count,
     iterations = 100000
     # iterations = 5
     for k in range(iterations):
-        # sums.append(sum_loops[0])
-        # if (k % 100) == 0:
-        #     print(f' loop {k} / {iterations}. experiment num: {experiment_num}. alleles: {alleles_count}. '
-        #           f'population: {population_amount}. alpha: {alpha_val}')
-        # print(observed)
-        # print('cdf dict:')
-        # print(cdf_dict)
-        # print(alleles_state)
 
         # updating the couples
         first_couple = [first_couple[0], couple_from_cdf[1]]
@@ -253,17 +245,17 @@ def perform_experiment(alleles_count,
         if sum_current >= list_probabilities[0]:
             bigger_counter += 1
 
-        # if plot_index is zero we have only one plot, if bigger than zero we have subplots.
-        if plot_index > 0:
-            plt.subplot(3, 2, plot_index)
-            plt.xticks([])
-            if (plot_index % 2) == 0:
-                plt.yticks([])
-            ax = plt.gca()
-            ax.tick_params(axis='y', labelsize=10)
+    # if plot_index is zero we have only one plot, if bigger than zero we have subplots.
+    if plot_index > 0:
+        plt.subplot(3, 2, plot_index)
+        plt.xticks([])
+        if (plot_index % 2) == 0:
+            plt.yticks([])
+        ax = plt.gca()
+        ax.tick_params(axis='y', labelsize=10)
 
-        if plot_index >= 0:
-            plt.plot(list(range(start_from, len(values) + start_from)), values, color='black')
+    if plot_index >= 0:
+        plt.plot(list(range(start_from, len(values) + start_from)), values, color='black')
 
     result = bigger_counter / (len(list_probabilities) - start_from)
     p_value = 1.0 - 2 * abs(max(0.5, result) - 0.5)
