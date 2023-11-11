@@ -1,6 +1,10 @@
 import numpy as np
+import math
+import pandas as pd
 import scipy.stats as stats
 import csv
+from matplotlib import pyplot as plt
+import seaborn as sns
 
 
 # need to calculate only on the upper triangle because the matrices are symmetric
@@ -73,19 +77,23 @@ def run_experiment(alleles_count, population_amount, alleles_probabilities,
     return p_value, chi_squared_stat, dof
 
 
-def full_algorithm(file_path, should_save_csv=False, cutoff_value=2.0):
+def full_algorithm(file_path, cutoff_value=0.0, should_save_csv=False, should_save_plot=False):
     """
-    Modified Chi-Squared Algorithm.
+    ASTRA Algorithm.
 
     Performs a modified Chi-Squared statistical test on ambiguous observations.
     :param file_path: A path to a csv file with columns: 1) index or id of a donor (integer or string).
     2) first allele (integer or string). 3) second allele (integer or string). 4) probability (float).
-    :param should_save_csv: Either boolean or string, if it's True then a csv with the columns:
+    :param cutoff_value: (optional, default value is 0.0) A float value that decides to not account (O-E)^2 / E in the summation
+    of the Chi-Squared statistic if E < cutoff.
+    :param should_save_csv: (optional, default value is False) Either boolean or string, if it's True then a csv with the columns:
      [first allele, second allele, observed, expected, variance] is saved (named 'alleles_data.csv')
     and if it's a string then a csv with the given string name is saved.
-    :param cutoff_value: A float value that decides to not account (O-E)^2 / E in the summation
-    of the Chi-Squared statistic if E < cutoff.
-    :return: p-value (float), degrees of freedom (integer), Chi-Squared statistic (float), also saves a csv.
+    :param should_save_plot: (optional, default value is False) Either boolean or string, if it's True then
+    a png containing 2 bar plots is saved: for each allele showing its chi squared statistic over degrees of freedom
+    (summing over the observations only associated with this allele) and -log_10(p_value).
+    If it's a string then a csv with the given string name is saved.
+    :return: p-value (float), Chi-Squared statistic (float), degrees of freedom (integer). also saves a csv.
     with columns: first allele, second allele, observed, variance:
     """
     id_to_index = {}
@@ -159,6 +167,9 @@ def full_algorithm(file_path, should_save_csv=False, cutoff_value=2.0):
 
             correction[allele_1_index, allele_2_index] += (probability ** 2)
 
+    # p(i) = sum_k_j p_k(i,j) / N
+    alleles_probabilities /= population_amount
+
     for i in range(alleles_count):
         for j in range(alleles_count):
             observed_probabilities[i, j] /= population_amount
@@ -176,4 +187,74 @@ def full_algorithm(file_path, should_save_csv=False, cutoff_value=2.0):
                                                should_save_csv_=should_save_csv,
                                                cutoff_value_=cutoff_value)
 
-    return p_value
+    if should_save_plot:
+        # save a bar plot showing for each allele its deviation from HWE
+        couples_amount = int((alleles_count * (alleles_count + 1)) / 2 - 1)
+        df = pd.DataFrame(index=range(couples_amount), columns=['Alleles', 'Normalized statistic', '-log_10(p_value)'])
+        logs_list = []
+        for i in range(alleles_count):
+            # for allele i: calculate Statistic and p_value
+            statistic = 0.0
+            amount_of_small_expected = 0
+            for j in range(alleles_count):
+                t, m = min(i, j), max(i, j)
+                mult = 1
+                if t != m:
+                    mult = 2
+                expected = mult * population_amount * alleles_probabilities[t] * alleles_probabilities[m]
+                if expected < cutoff_value:
+                    amount_of_small_expected += 1
+                    continue
+                observed = population_amount * observed_probabilities[t, m]
+                statistic += (1 / correction[t, m]) * (((expected - observed) ** 2) / expected)
+            # calculate degrees of freedom
+            dof = (alleles_count - 1) - amount_of_small_expected
+            # calculate p_value
+            p_value = 1 - stats.chi2.cdf(x=statistic,
+                                         df=dof)
+            if p_value == 0.0:
+                logs_list.append('infty')
+            else:
+                logs_list.append(-math.log(p_value, 10))
+            allele = index_to_allele[i]
+            df.iloc[i] = [allele, statistic / dof, 0]
+
+        # sort dataframe according to p_values and take the smallest 20 statistics.
+        df = df.sort_values('Normalized statistic').head(20)
+        # we need to update the log p-values (some may be infinite, so we set them to the max value from the 20)
+        logs_list_ints = [logs_list[i] for i in df.index if isinstance(logs_list[i], (int, float))]
+        max_log = max(logs_list_ints)
+        for i in df.index:
+            if logs_list[i] == 'infty':
+                logs_list[i] = max_log
+            df.iloc[0, 2] = logs_list[i]
+        # plot the dataframe into 2 bar plots
+        fig, axes = plt.subplots(1, 2)
+        plt.subplot(1, 2, 1)
+        sns.set_color_codes('pastel')
+        sns.barplot(x='-log_10(p_value)', y='Alleles', data=df,
+                    label='Total', color='royalblue', edgecolor='w')
+        sns.set_color_codes('muted')
+        # invert the order of x-axis values
+        ax = plt.gca()
+        ax.set_xlim(ax.get_xlim()[::-1])
+        # ax.yaxis.set_label_position("right")
+        ax.yaxis.tick_right()
+        plt.ylabel('')
+
+        # move ticks to the right
+
+        plt.subplot(1, 2, 2)
+        sns.barplot(x='Normalized statistic', y='Alleles', data=df,
+                    color='slategrey', edgecolor='w')
+        # plt.legend(ncol=2, loc='lower right')
+        sns.despine(left=True, bottom=True)
+        fig.tight_layout()
+
+        if isinstance(should_save_plot, str):
+            file_name = should_save_plot + '.png'
+        else:
+            file_name = 'alleles_barplot.png'
+        plt.savefig(file_name, pad_inches=0.2, bbox_inches="tight")
+
+    return p_value, chi_squared, dof

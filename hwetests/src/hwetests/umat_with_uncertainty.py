@@ -4,16 +4,13 @@ import random
 import umat
 
 
-def full_algorithm(file_path, should_save_csv=False):
+def full_algorithm(file_path):
     """
-    Modified Chi-Squared Algorithm.
+    UMAT with sampling algorithm.
 
-    Performs a modified Chi-Squared statistical test on ambiguous observations.
+    Performs UMAT test on ambiguous observations.
     :param file_path: A path to a csv file with columns: 1) index or id of a donor (integer or string).
-    2) first allele (integer or string). 3) second allele (integer or string). 4) probability (float).
-    :param should_save_csv: Either boolean or string, if it's True then a csv with the columns:
-     [first allele, second allele, observed, expected, variance] is saved (named 'alleles_data.csv')
-    and if it's a string then a csv with the given string name is saved.
+    2) first allele (integer or string). 3) second allele (integer or string). 4) probability (float).+
     :return: p-value (float), degrees of freedom (integer), Chi-Squared statistic (float), also saves a csv.
     with columns: first allele, second allele, observed, variance:
     """

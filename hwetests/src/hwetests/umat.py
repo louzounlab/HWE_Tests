@@ -285,7 +285,7 @@ def full_algorithm(observations, should_save_plot=False):
     :return: A p-value under the null Hypothesis that observations are distributed around HWE.
     """
     alleles_count = observations.shape[0]
-    population_amount_calculated = np.sum(observations) # check this is integer
+    population_amount_calculated = np.sum(observations)  # check this is integer
 
     # in case the matrix is not upper triangular
     for i in range(alleles_count):
