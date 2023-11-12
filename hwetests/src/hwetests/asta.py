@@ -89,7 +89,7 @@ def full_algorithm(file_path, cutoff_value=0.0, should_save_csv=False, should_sa
      [first allele, second allele, observed, expected, variance] is saved (named 'alleles_data.csv')
     and if it's a string then a csv with the given string name is saved.
     :param should_save_plot: (optional, default value is False) Either boolean or string, if it's True then
-    a png containing 2 bar plots is saved: for each allele showing its chi squared statistic over degrees of freedom
+    a png containing 2 bar plots is saved (named 'alleles_barplot.png') for each allele showing its chi squared statistic over degrees of freedom
     (summing over the observations only associated with this allele) and -log_10(p_value).
     If it's a string then a csv with the given string name is saved.
     :return: p-value (float), Chi-Squared statistic (float), degrees of freedom (integer). also saves a csv.
