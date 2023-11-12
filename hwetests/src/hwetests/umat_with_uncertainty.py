@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import random
-import umat
+from . import umat
 
 
 def full_algorithm(file_path):
@@ -31,14 +31,14 @@ def full_algorithm(file_path):
                 continue
             lst = line.strip('\n').split(',')
 
-            id = lst[0]
+            current_id = lst[0]
             allele_1 = lst[1]
             allele_2 = lst[2]
             # allele_1, allele_2 = min(allele_1, allele_2), max(allele_1, allele_2)
             # probability = float(lst[3])
 
-            if id not in id_to_index:
-                id_to_index[id] = len(id_to_index)
+            if current_id not in id_to_index:
+                id_to_index[current_id] = len(id_to_index)
 
             if allele_1 not in allele_to_index:
                 # updating the inverse dictionary
@@ -65,6 +65,7 @@ def full_algorithm(file_path):
                             probability_col: float})
     df = df.sort_values(by=id_col)
     temp_file_path = 'temp_file.csv'
+    df = pd.DataFrame(df).set_index(id_col)
     df.to_csv(temp_file_path)
 
     # now the ids are sorted, for each donor k we sample alleles (i, j) from his set of probabilities
@@ -92,7 +93,6 @@ def full_algorithm(file_path):
                 # update observations
                 observations[i, j] += 1
                 # reset last person
-                last_id = current_id
                 last_probabilities = []
                 last_possible_alleles = []
 
@@ -101,13 +101,14 @@ def full_algorithm(file_path):
             # allele_1, allele_2 = min(allele_1, allele_2), max(allele_1, allele_2)
             probability = float(lst[3])
 
-            id_index = id_to_index[id]
+            # id_index = id_to_index[current_id]
 
             allele_1_index = allele_to_index[allele_1]
             allele_2_index = allele_to_index[allele_2]
 
             allele_1_index, allele_2_index = min(allele_1_index, allele_2_index), max(allele_1_index, allele_2_index)
 
+            last_id = current_id
             last_probabilities.append(probability)
             last_possible_alleles.append([allele_1_index, allele_2_index])
 

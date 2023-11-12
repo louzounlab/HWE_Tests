@@ -8,7 +8,8 @@ import seaborn as sns
 
 
 # need to calculate only on the upper triangle because the matrices are symmetric
-def calculate_chi_squared_value(alleles_amount, population_amount_, alleles_probabilities, observed_probabilities, correction, cutoff):
+def calculate_chi_squared_value(alleles_amount, population_amount_, alleles_probabilities,
+                                observed_probabilities, correction, cutoff):
     value = 0.0
     amount_of_small_expected_ = 0
     for row in range(alleles_amount):
@@ -29,9 +30,12 @@ def calculate_chi_squared_value(alleles_amount, population_amount_, alleles_prob
 
 def run_experiment(alleles_count, population_amount, alleles_probabilities,
                    observed_probabilities, correction, index_to_allele_, should_save_csv_, cutoff_value_):
-
     chi_squared_stat, amount_of_small_expected = calculate_chi_squared_value(alleles_amount=alleles_count,
-                                                                             population_amount_=population_amount,                                                                cutoff=cutoff_value_)
+                                                                             population_amount_=population_amount,
+                                                                             alleles_probabilities=alleles_probabilities,
+                                                                             observed_probabilities=observed_probabilities,
+                                                                             correction=correction,
+                                                                             cutoff=cutoff_value_)
     couples_amount = (alleles_count * (alleles_count + 1)) / 2 - 1
     dof = couples_amount - amount_of_small_expected
 
@@ -74,7 +78,7 @@ def run_experiment(alleles_count, population_amount, alleles_probabilities,
 
 def full_algorithm(file_path, cutoff_value=0.0, should_save_csv=False, should_save_plot=False):
     """
-    ASTRA Algorithm.
+    ASTA Algorithm.
 
     Performs a modified Chi-Squared statistical test on ambiguous observations.
     :param file_path: A path to a csv file with columns: 1) index or id of a donor (integer or string).
@@ -194,8 +198,8 @@ def full_algorithm(file_path, cutoff_value=0.0, should_save_csv=False, should_sa
     if should_save_plot:
         # save a bar plot showing for each allele its deviation from HWE
         couples_amount = int((alleles_count * (alleles_count + 1)) / 2 - 1)
-        df = pd.DataFrame(index=range(couples_amount), columns=['Alleles', 'Normalized statistic', '-log_10(p_value)'])
-        logs_list = np.zeros(shape=couples_amount)
+        df = pd.DataFrame(index=range(alleles_count), columns=['Alleles', 'Normalized statistic', '-log_10(p_value)'])
+        logs_list = [0 for _ in range(alleles_count)]
         for i in range(alleles_count):
             # for allele i: calculate Statistic and p_value
             statistic = 0.0
@@ -206,28 +210,29 @@ def full_algorithm(file_path, cutoff_value=0.0, should_save_csv=False, should_sa
                 if t != m:
                     mult = 2
                 expected_val = mult * population_amount * alleles_probabilities[t] * alleles_probabilities[m]
-                if expected_val < cutoff_value:
-                    amount_of_small_expected += 1
-                    continue
                 observed_val = population_amount * observed_probabilities[t, m]
                 correction_val = correction[t, m]
                 variance_val = expected_val * correction_val
+                if variance_val < cutoff_value:
+                    amount_of_small_expected += 1
+                    continue
                 statistic += ((expected_val - observed_val) ** 2) / variance_val
             # calculate degrees of freedom
-            dof = (alleles_count - 1) - amount_of_small_expected
+            dof_i = (alleles_count - 1) - amount_of_small_expected
 
             allele = index_to_allele[i]
 
-            if dof <= 0:
-                df.loc[i] = [allele, '?']
+            if dof_i <= 0:
+                df.loc[i] = [allele, 2.0, '?']
+                continue
             # calculate p_value
-            p_value = 1 - stats.chi2.cdf(x=statistic,
-                                         df=dof)
-            if p_value == 0.0:
+            p_value_i = 1 - stats.chi2.cdf(x=statistic,
+                                           df=dof_i)
+            if p_value_i == 0.0:
                 logs_list[i] = 'infty'
             else:
-                logs_list[i] = -math.log(p_value, 10)
-            df.loc[i] = [allele, statistic / dof, 0]
+                logs_list[i] = -math.log(p_value_i, 10)
+            df.loc[i] = [allele, statistic / dof, logs_list[i]]
 
         # sort dataframe according to p_values and take the smallest 20 statistics.
         df = df.sort_values('Normalized statistic').head(min(alleles_count, 20))
@@ -237,7 +242,7 @@ def full_algorithm(file_path, cutoff_value=0.0, should_save_csv=False, should_sa
         for i in df.index:
             if logs_list[i] == 'infty':
                 logs_list[i] = max_log
-            df.iloc[i, 2] = logs_list[i]
+            df.loc[i, '-log_10(p_value)'] = logs_list[i]
         df = df.loc[df['-log_10(p_value)'] != '?']
         # plot the dataframe into 2 bar plots
         fig, axes = plt.subplots(1, 2)
