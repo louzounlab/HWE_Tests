@@ -197,53 +197,59 @@ def full_algorithm(file_path, cutoff_value=0.0, should_save_csv=False, should_sa
 
     if should_save_plot:
         # save a bar plot showing for each allele its deviation from HWE
-        couples_amount = int((alleles_count * (alleles_count + 1)) / 2 - 1)
+        # couples_amount = int((alleles_count * (alleles_count + 1)) / 2 - 1)
         df = pd.DataFrame(index=range(alleles_count), columns=['Alleles', 'Normalized statistic', '-log_10(p_value)'])
         logs_list = [0 for _ in range(alleles_count)]
         for i in range(alleles_count):
             # for allele i: calculate Statistic and p_value
-            statistic = 0.0
-            amount_of_small_expected = 0
+            statistic_i = 0.0
+            amount_of_small_expected_i = 0
             for j in range(alleles_count):
                 t, m = min(i, j), max(i, j)
                 mult = 1
                 if t != m:
                     mult = 2
-                expected_val = mult * population_amount * alleles_probabilities[t] * alleles_probabilities[m]
-                observed_val = population_amount * observed_probabilities[t, m]
-                correction_val = correction[t, m]
-                variance_val = expected_val * correction_val
-                if variance_val < cutoff_value:
-                    amount_of_small_expected += 1
+                expected_val_i = mult * population_amount * alleles_probabilities[t] * alleles_probabilities[m]
+                observed_val_i = population_amount * observed_probabilities[t, m]
+                correction_val_i = correction[t, m]
+                variance_val_i = expected_val_i * correction_val_i
+                if variance_val_i < cutoff_value:
+                    amount_of_small_expected_i += 1
                     continue
-                statistic += ((expected_val - observed_val) ** 2) / variance_val
+                statistic_i += ((expected_val_i - observed_val_i) ** 2) / variance_val_i
             # calculate degrees of freedom
-            dof_i = (alleles_count - 1) - amount_of_small_expected
+            dof_i = (alleles_count - 1) - amount_of_small_expected_i
 
-            allele = index_to_allele[i]
-
-            if dof_i <= 0:
-                df.loc[i] = [allele, 2.0, '?']
+            # if degrees of freedom for allele i is too small and we have many alleles, don't plot this allele
+            if (dof_i < 10) and (alleles_count > 11):
                 continue
+
+            allele_i = index_to_allele[i]
+
+            # if dof_i <= 0:
+            #     df.loc[i] = [allele_i, 2.0, '?']
+            #     continue
             # calculate p_value
-            p_value_i = 1 - stats.chi2.cdf(x=statistic,
+            p_value_i = 1 - stats.chi2.cdf(x=statistic_i,
                                            df=dof_i)
             if p_value_i == 0.0:
-                logs_list[i] = 'infty'
+                logs_list[i] = float('inf')
             else:
                 logs_list[i] = -math.log(p_value_i, 10)
-            df.loc[i] = [allele, statistic / dof, logs_list[i]]
+            df.loc[i] = [allele_i, statistic_i / dof_i, logs_list[i]]
 
         # sort dataframe according to p_values and take the smallest 20 statistics.
-        df = df.sort_values('Normalized statistic').head(min(alleles_count, 20))
+        df = df.sort_values('-log_10(p_value)', ascending=False).head(min(alleles_count, 20))
         # we need to update the log p-values (some may be infinite, so we set them to the max value from the 20)
-        logs_list_ints = [logs_list[i] for i in df.index if isinstance(logs_list[i], (int, float))]
-        max_log = max(logs_list_ints)
-        for i in df.index:
-            if logs_list[i] == 'infty':
-                logs_list[i] = max_log
-            df.loc[i, '-log_10(p_value)'] = logs_list[i]
-        df = df.loc[df['-log_10(p_value)'] != '?']
+
+        # logs_list_ints = [logs_list[i] for i in df.index if isinstance(logs_list[i], (int, float))]
+        # max_log = max(logs_list_ints)
+        # for i in df.index:
+        #     if logs_list[i] == 'infty':
+        #         logs_list[i] = max_log
+        #     df.loc[i, '-log_10(p_value)'] = logs_list[i]
+        # df = df.loc[df['-log_10(p_value)'] != '?']
+
         # plot the dataframe into 2 bar plots
         fig, axes = plt.subplots(1, 2)
         plt.subplot(1, 2, 1)
