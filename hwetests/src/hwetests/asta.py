@@ -171,7 +171,7 @@ def full_algorithm(file_path, cutoff_value=0.0, should_save_csv=False, should_sa
     alleles_probabilities /= population_amount
 
     for i in range(alleles_count):
-        for j in range(alleles_count):
+        for j in range(i, alleles_count):
             observed_probabilities[i, j] /= population_amount
             if observed_probabilities[i, j] == 0:
                 correction[i, j] = 1.0
@@ -199,7 +199,7 @@ def full_algorithm(file_path, cutoff_value=0.0, should_save_csv=False, should_sa
         # save a bar plot showing for each allele its deviation from HWE
         # couples_amount = int((alleles_count * (alleles_count + 1)) / 2 - 1)
         df = pd.DataFrame(index=range(alleles_count), columns=['Alleles', 'Normalized statistic', '-log_10(p_value)'])
-        logs_list = [0 for _ in range(alleles_count)]
+        logs_list = ['s' for _ in range(alleles_count)]
         for i in range(alleles_count):
             # for allele i: calculate Statistic and p_value
             statistic_i = 0.0
@@ -222,59 +222,57 @@ def full_algorithm(file_path, cutoff_value=0.0, should_save_csv=False, should_sa
 
             # if degrees of freedom for allele i is too small and we have many alleles, don't plot this allele
             if (dof_i < 10) and (alleles_count > 11):
+                df.loc[i] = ['', 0, 's']
                 continue
 
             allele_i = index_to_allele[i]
 
-            # if dof_i <= 0:
-            #     df.loc[i] = [allele_i, 2.0, '?']
-            #     continue
-            # calculate p_value
             p_value_i = 1 - stats.chi2.cdf(x=statistic_i,
                                            df=dof_i)
             if p_value_i == 0.0:
-                logs_list[i] = float('inf')
+                logs_list[i] = 50
             else:
                 logs_list[i] = -math.log(p_value_i, 10)
             df.loc[i] = [allele_i, statistic_i / dof_i, logs_list[i]]
 
         # sort dataframe according to p_values and take the smallest 20 statistics.
+        df = df.loc[df['-log_10(p_value)'] != 's']
         df = df.sort_values('-log_10(p_value)', ascending=False).head(min(alleles_count, 20))
         # we need to update the log p-values (some may be infinite, so we set them to the max value from the 20)
 
-        # logs_list_ints = [logs_list[i] for i in df.index if isinstance(logs_list[i], (int, float))]
-        # max_log = max(logs_list_ints)
-        # for i in df.index:
-        #     if logs_list[i] == 'infty':
-        #         logs_list[i] = max_log
-        #     df.loc[i, '-log_10(p_value)'] = logs_list[i]
-        # df = df.loc[df['-log_10(p_value)'] != '?']
-
         # plot the dataframe into 2 bar plots
-        fig, axes = plt.subplots(1, 2)
-        plt.subplot(1, 2, 1)
-        sns.set_color_codes('pastel')
-        sns.barplot(x='-log_10(p_value)', y='Alleles', data=df,
-                    label='Total', color='royalblue', edgecolor='w')
-        sns.set_color_codes('muted')
-        # invert the order of x-axis values
-        ax = plt.gca()
-        ax.set_xlim(ax.get_xlim()[::-1])
-        # ax.yaxis.set_label_position("right")
-        ax.yaxis.tick_right()
-        plt.ylabel('')
+        # fig, axes = plt.subplots(1, 2)
+        # plt.subplot(1, 2, 1)
+        # sns.set_color_codes('pastel')
+        # sns.barplot(x='-log_10(p_value)', y='Alleles', data=df,
+        #             label='Total', color='royalblue', edgecolor='w')
+        # sns.set_color_codes('muted')
+        # # invert the order of x-axis values
+        # ax = plt.gca()
+        # ax.set_xlim(ax.get_xlim()[::-1])
+        # # ax.yaxis.set_label_position("right")
+        # ax.yaxis.tick_right()
+        # plt.ylabel('')
 
         # move ticks to the right
 
-        plt.subplot(1, 2, 2)
-        sns.barplot(x='Normalized statistic', y='Alleles', data=df,
-                    color='slategrey', edgecolor='w')
+        # plt.subplot(1, 2, 2)
+        # making a scatter plot with color bar
+        plot = plt.scatter(df['Normalized statistic'], df['Alleles'], c=df['-log_10(p_value)'], cmap='Reds')
+        # plotting the color bar
+        cbar = plt.colorbar()
+        cbar.set_label('-log_10(p_value)')
+        # removing the points from the color bar
+        plot.remove()
+        ax = sns.barplot(x='Normalized statistic', y='Alleles', data=df,
+                         hue=df['-log_10(p_value)'], palette='Reds', dodge=False)
         # plt.legend(ncol=2, loc='lower right')
         sns.despine(left=True, bottom=True)
-        fig.tight_layout()
+        ax.legend_.remove()
+        # fig.tight_layout()
 
         if isinstance(should_save_plot, str):
-            file_name = should_save_plot + '.png'
+            file_name = should_save_plot
         else:
             file_name = 'alleles_barplot.png'
         plt.savefig(file_name, pad_inches=0.2, bbox_inches="tight")
