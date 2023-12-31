@@ -226,7 +226,7 @@ def perform_experiment(alleles_count,
     # now we have the list of probabilities. check if 95% of the elements (sum of deltas) are bigger than 1.
     sum_current = 0
     bigger_counter = 0
-    start_from = 20000
+    start_from = 30000
     # start_from = calculate_start_time(alleles_count=alleles_count,
     #                                                        population_amount=population_amount_calculated,
     #                                                        alleles_probabilities=alleles_probabilities,
