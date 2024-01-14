@@ -314,15 +314,15 @@ def full_algorithm(file_path,
 
         # making a scatter plot with color bar
         sns.set_style('white')
-        plt.rcParams["font.family"] = "Arial"
+        plt.rcParams["font.family"] = "Times New Roman"
 
         # plt.figure(figsize=((6, 6)))
         plot = plt.scatter(df['Normalized statistic'], df['Alleles'], c=df['-log_10(p_value)'], cmap='Reds',
                            vmin=0, vmax=max_log)
         # plotting the color bar
         cbar = plt.colorbar()
-        cbar.ax.tick_params(labelsize=4)
-        cbar.set_label('-log_10(p_value)', fontsize=5)
+        cbar.ax.tick_params(labelsize=16)
+        cbar.set_label('-log_10(p_value)', fontsize=16)
         # removing the points from the color bar
         plot.remove()
         if df['-log_10(p_value)'].nunique() == 1:
@@ -337,16 +337,16 @@ def full_algorithm(file_path,
         # fig.tight_layout()
 
         # take care of the font sizes
-        ax.set_xlabel('Normalized statistic', fontsize=5)
-        ax.set_ylabel('Alleles', fontsize=5)
-        ax.tick_params(labelsize=4)
+        ax.set_xlabel('Normalized statistic', fontsize=18)
+        ax.set_ylabel('Alleles', fontsize=18)
+        ax.tick_params(labelsize=16)
         if isinstance(should_save_plot, str):
             file_name = should_save_plot
         else:
-            file_name = 'alleles_barplot.png'
+            file_name = 'alleles_barplot.pdf'
         if title:
-            plt.title(title, fontsize=6)
-        plt.savefig(file_name, pad_inches=0.2, bbox_inches="tight")
+            plt.title(title, fontsize=20)
+        plt.savefig(file_name, format='pdf', bbox_inches="tight")
         # clear plt
         # plt.clf()
         # plt.close()
