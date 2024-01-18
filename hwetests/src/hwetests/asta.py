@@ -7,7 +7,6 @@ import matplotlib as mpl
 from matplotlib import pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 import seaborn as sns
-import RATIO
 
 
 # need to calculate only on the upper triangle because the matrices are symmetric
@@ -321,8 +320,9 @@ def full_algorithm(file_path,
                            vmin=0, vmax=max_log)
         # plotting the color bar
         cbar = plt.colorbar()
-        cbar.ax.tick_params(labelsize=16)
-        cbar.set_label('-log_10(p_value)', fontsize=16)
+        # cbar.ax.tick_params(labelsize=15)
+        cbar.ax.tick_params(labelsize=5)
+        cbar.set_label('-log_10(p_value)', fontsize=7)
         # removing the points from the color bar
         plot.remove()
         if df['-log_10(p_value)'].nunique() == 1:
@@ -337,15 +337,19 @@ def full_algorithm(file_path,
         # fig.tight_layout()
 
         # take care of the font sizes
-        ax.set_xlabel('Normalized statistic', fontsize=18)
-        ax.set_ylabel('Alleles', fontsize=18)
-        ax.tick_params(labelsize=16)
+        # ax.set_xlabel('Normalized statistic', fontsize=18)
+        ax.set_xlabel('Normalized statistic', fontsize=7)
+        # ax.set_ylabel('Alleles', fontsize=18)
+        ax.set_ylabel('Alleles', fontsize=7)
+        # ax.tick_params(labelsize=15)
+        ax.tick_params(labelsize=5)
         if isinstance(should_save_plot, str):
             file_name = should_save_plot
         else:
             file_name = 'alleles_barplot.pdf'
         if title:
-            plt.title(title, fontsize=20)
+            # plt.title(title, fontsize=20)
+            plt.title(title, fontsize=8)
         plt.savefig(file_name, format='pdf', bbox_inches="tight")
         # clear plt
         # plt.clf()

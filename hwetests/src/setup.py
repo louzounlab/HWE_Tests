@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="hwetests",
-    version="0.5.8",
+    version="0.6.5",
     author="Or Shkuri",
     author_email="orshkuri2000@gmail.com",
     packages=["hwetests"],
@@ -15,5 +15,9 @@ setuptools.setup(
     url="https://github.com/ExtraFlash/HWE_tests_package",
     license='MIT',
     python_requires='>=3.8',
-    install_requires=[]
+    install_requires=['numpy>=1.22.4',
+                      'pandas>=1.4.3',
+                      'scipy>=1.7.3',
+                      'matplotlib>=3.7.4',
+                      'seaborn>=0.12.0']
 )
