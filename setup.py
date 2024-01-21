@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="hwetests",
-    version="0.6.7",
+    version="0.6.9",
     author="Or Shkuri",
     author_email="orshkuri2000@gmail.com",
     packages=["src/hwetests"],
