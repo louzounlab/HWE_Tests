@@ -1,3 +1,18 @@
+<p align="center">
+    <br>
+    <img src="https://raw.githubusercontent.com/huggingface/diffusers/main/docs/source/en/imgs/diffusers_library.jpg" width="400"/>
+    <br>
+<p>
+<p align="center">
+<p align="center">
+    <a href="https://img.shields.io/badge/python-100%25-blue">
+        <img alt="python" src="https://img.shields.io/badge/python-100%25-blue">
+    </a>
+    <a href="https://img.shields.io/badge/license-MIT-blue">
+        <img alt="license" src="https://img.shields.io/badge/license-MIT-blue">
+    </a>
+
+
 # hwetests
 ![Static Badge](https://img.shields.io/badge/python-100%25-blue) ![Static Badge](https://img.shields.io/badge/license-MIT-blue
 )
@@ -15,8 +30,8 @@ Both  **ASTA** and **UMAT with sampling** assume ambiguity in the observations w
 
 -  [Installation](#installation)
 
--  [Usage](#usage)
-- [Tests](#tests)
+-  [Quick tour](#quick_tour)
+- [Examples](#examples)
 
 -  [Credits](#credits)
 
@@ -28,16 +43,21 @@ Use the package manager [pip](https://pip.pypa.io/en/stable/) to install hwetest
 pip install hwetests
 ```
 
-## How to use our package?
-Our package is very simple to use. 
-in order to run any statistical test, you only need to use one function to get your results.
-One can find the statistical tests in
+## Quick tour
+To immediately use our package, you only need to run a single function.
 
-Here is the tour for each statistical test:
 ### ASTA
+```python
+def full_algorithm(file_path,  
+                   is_first_row_contains_columns_names=False,  
+                   cutoff_value=0.0,  
+                   should_save_csv=False,  
+                   should_save_plot=False,  
+                   title=''):
+```
+Suppose
 
-
-## Demos
+## Examples
 
 Here we show how to use our package with simulated data.
 You can find the scripts and the simulated data in:
@@ -45,8 +65,8 @@ You can find the scripts and the simulated data in:
 ├───src
 │   ├───test
 │   │   ├───data
-│   │   │   └───unambiguous_data.csv # for ASTA and UMAT with sampling
-│   │   │   └───ambiguous_data.csv # for UMAT
+│   │   │   └───unambiguous_data.csv # for ASTA and UMAT with sampling (contains 50k population, 20 alleles, 0.2 uncertainty, in HWE)
+│   │   │   └───ambiguous_data.csv # for UMAT (contains 100k population, in HWE)
 │   │   ├───scripts
 │   │   │   └───asta_test.py
 │   │   │   └───umat_test.py
@@ -85,13 +105,6 @@ from hwetests import umat_with_uncertainty
 if __name__ == '__main__':  
     p_value = umat_with_uncertainty.full_algorithm(file_path='../data/ambiguous_data.csv')
 ```
-
-## Tests
-
-Go the extra mile and write tests for your application. Then provide examples on how to run them here.
-
-## Badges
-![Static Badge](https://img.shields.io/badge/python-100%25-blue)
 
 
 ## License
