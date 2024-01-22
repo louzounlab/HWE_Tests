@@ -1,11 +1,11 @@
 import setuptools
 
-with open("README.md", "r") as fh:
+with open("../README.md", "r") as fh:
     description = fh.read()
 
 setuptools.setup(
     name="hwetests",
-    version="0.7.2",
+    version="0.7.4",
     author="Or Shkuri",
     author_email="orshkuri2000@gmail.com",
     packages=["hwetests"],
