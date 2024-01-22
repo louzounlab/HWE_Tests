@@ -5,10 +5,10 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="hwetests",
-    version="0.6.9",
+    version="0.7.2",
     author="Or Shkuri",
     author_email="orshkuri2000@gmail.com",
-    packages=["src/hwetests"],
+    packages=["hwetests"],
     description="A python package containing two statistical tests for HWE testing: Gibbs Sampling test and a modified Chi Squared test that handles ambiguity",
     long_description=description,
     long_description_content_type="text/markdown",
