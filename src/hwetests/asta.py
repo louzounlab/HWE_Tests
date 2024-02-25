@@ -310,6 +310,7 @@ def full_algorithm(file_path,
         # move ticks to the right
 
         # plt.subplot(1, 2, 2)
+        fig = plt.figure()
 
         # making a scatter plot with color bar
         sns.set_style('white')
@@ -346,11 +347,15 @@ def full_algorithm(file_path,
         if isinstance(should_save_plot, str):
             file_name = should_save_plot
         else:
-            file_name = 'alleles_barplot.pdf'
+            file_name = 'alleles_barplot'
         if title:
             # plt.title(title, fontsize=20)
             plt.title(title, fontsize=8)
-        plt.savefig(file_name, format='pdf', bbox_inches="tight")
+        # check whether to save in pdf format or other formats
+        if file_name.endswith('.pdf'):
+            plt.savefig(file_name, format='pdf', bbox_inches="tight")
+        else:
+            plt.savefig(file_name, pad_inches=0.2, bbox_inches="tight")
         # clear plt
         # plt.clf()
         # plt.close()
