@@ -238,7 +238,7 @@ def full_algorithm(file_path,
     if should_save_plot:
         # save a bar plot showing for each allele its deviation from HWE
         # couples_amount = int((alleles_count * (alleles_count + 1)) / 2 - 1)
-        df = pd.DataFrame(index=range(alleles_count), columns=['Alleles', 'Normalized statistic', '-log_10(p_value)'])
+        df = pd.DataFrame(index=range(alleles_count), columns=['Alleles', 'Normalized Statistic', '-log_10(p_value)'])
         logs_list = ['s' for _ in range(alleles_count)]
         p_values = [0.0 for _ in range(alleles_count)]
         for i in range(alleles_count):

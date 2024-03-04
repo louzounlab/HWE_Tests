@@ -188,7 +188,6 @@ def perform_experiment(alleles_count,
     iterations = 100000
     # iterations = 5
     for k in range(iterations):
-
         # updating the couples
         first_couple = [first_couple[0], couple_from_cdf[1]]
         second_couple = [second_couple[0], couple_from_cdf[0]]
