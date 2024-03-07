@@ -5,11 +5,11 @@ with open("README.md", "r", encoding='utf-8') as fh:
 
 setuptools.setup(
     name="hwetests",
-    version="0.8.2",
+    version="0.8.7",
     author="Or Shkuri",
     author_email="orshkuri2000@gmail.com",
-    packages=["hwetests", "hwetests.test", "hwetests.test.data"],
-    description="A python package containing two statistical tests for HWE testing: Gibbs Sampling test and a modified Chi Squared test that handles ambiguity",
+    packages=["hwetests", "hwetests.tests", "hwetests.tests.scripts"],
+    description="A python package containing two statistical tests for HWE testing: Gibbs Sampling tests and a modified Chi Squared tests that handles ambiguity",
     long_description=description,
     long_description_content_type="text/markdown",
     include_package_data=True,

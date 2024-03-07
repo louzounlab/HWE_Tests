@@ -3,17 +3,17 @@ import random
 import matplotlib.pyplot as plt
 
 
-def get_O_ij(observed, i, j):
+def _get_O_ij(observed, i, j):
     row, col = min(i, j), max(i, j)
     return observed[row, col]
 
 
-def get_p_ij(probabilities, i, j):
+def _get_p_ij(probabilities, i, j):
     i, j = min(i, j), max(i, j)
     return probabilities[i, j]
 
 
-def calc_observed_cdf(alleles_count, observed):
+def _calc_observed_cdf(alleles_count, observed):
     # list of numpy arrays
     observed_cdf = []
     for i in range(alleles_count):
@@ -30,7 +30,7 @@ def calc_observed_cdf(alleles_count, observed):
 
 
 # calculate the starting index for the gibbs sampling
-def calculate_start_time(alleles_count, population_amount, alleles_probabilities, observed, observed_cdf, iterations):
+def _calculate_start_time(alleles_count, population_amount, alleles_probabilities, observed, observed_cdf, iterations):
     observed_cdf = [np_array / sum(np_array) for np_array in observed_cdf]
     start_time = 0.0
     for i in range(alleles_count):
@@ -52,8 +52,8 @@ def calculate_start_time(alleles_count, population_amount, alleles_probabilities
     return start_time
 
 
-def update_current_delta_probability(list_probabilities: list, observed, observed_cdf, alleles_probabilities, couples,
-                                     population_amount_calculated, probabilities):
+def _update_current_delta_probability(list_probabilities: list, observed, observed_cdf, alleles_probabilities, couples,
+                                      population_amount_calculated, probabilities):
     for row in range(couples.shape[0]):
         # here we make sure that i <= j so we can access the upper triangle of probabilities
         i, j = min(couples[row, 0], couples[row, 1]), max(couples[row, 0], couples[row, 1])
@@ -66,19 +66,19 @@ def update_current_delta_probability(list_probabilities: list, observed, observe
             if sign == -1:
                 # val = np.log(observed[i, j] / (population_amount_calculated - observed[i, j] + 1)) \
                 #       + np.log((1 - get_p_ij(alleles_probabilities, i, j)) / get_p_ij(alleles_probabilities, i, j))
-                val = np.log(get_O_ij(observed, i, j)) - np.log(
-                    population_amount_calculated - get_O_ij(observed, i, j) + 1) \
-                      - np.log(get_p_ij(probabilities, i, j)) + np.log(1 - get_p_ij(probabilities, i, j))
+                val = np.log(_get_O_ij(observed, i, j)) - np.log(
+                    population_amount_calculated - _get_O_ij(observed, i, j) + 1) \
+                      - np.log(_get_p_ij(probabilities, i, j)) + np.log(1 - _get_p_ij(probabilities, i, j))
             elif sign == 1:
-                val = np.log(population_amount_calculated - get_O_ij(observed, i, j)) - np.log(
-                    get_O_ij(observed, i, j) + 1) \
-                      + np.log(get_p_ij(probabilities, i, j)) - np.log(1 - get_p_ij(probabilities, i, j))
+                val = np.log(population_amount_calculated - _get_O_ij(observed, i, j)) - np.log(
+                    _get_O_ij(observed, i, j) + 1) \
+                      + np.log(_get_p_ij(probabilities, i, j)) - np.log(1 - _get_p_ij(probabilities, i, j))
         except RuntimeWarning:
             print(f'''
 i,j: {i}, {j}.
-O_ij: {get_O_ij(observed, i, j)}
+O_ij: {_get_O_ij(observed, i, j)}
 population calculated: {population_amount_calculated}
-p_ij: {get_p_ij(probabilities, i, j)}
+p_ij: {_get_p_ij(probabilities, i, j)}
 sign: {sign}
 observations: {observed}
 alleles probabilities: {alleles_probabilities}''')
@@ -103,9 +103,9 @@ alleles probabilities: {alleles_probabilities}''')
 
 # given the simulated data (or real data), perform Gibbs Sampling.
 # returns:  result (1 for significance or 0)
-def perform_experiment(alleles_count,
-                       population_amount_calculated, alleles_probabilities, probabilities, observed, observed_cdf,
-                       plot_index=0):
+def _perform_experiment(alleles_count,
+                        population_amount_calculated, alleles_probabilities, probabilities, observed, observed_cdf,
+                        plot_index=0):
     # [ln(p_0), ln(p_1),...,]
     # actually [0, delta_1, delta_2,...,delta_k]
     list_probabilities = []
@@ -153,9 +153,9 @@ def perform_experiment(alleles_count,
     couples[1, :] = [second_couple[0], second_couple[1], +1]
 
     # calculate new delta and modify observed
-    update_current_delta_probability(list_probabilities, observed, observed_cdf, alleles_probabilities, couples,
-                                     population_amount_calculated,
-                                     probabilities)
+    _update_current_delta_probability(list_probabilities, observed, observed_cdf, alleles_probabilities, couples,
+                                      population_amount_calculated,
+                                      probabilities)
 
     # pick two alleles using the cdf (first we pick a number between 0 and 1 and then get element with the closest
     # probability)
@@ -180,9 +180,9 @@ def perform_experiment(alleles_count,
     couples[1, :] = [second_couple[1], allele_2, -1]
 
     # calculate new delta and modify observed
-    update_current_delta_probability(list_probabilities, observed, observed_cdf, alleles_probabilities, couples,
-                                     population_amount_calculated,
-                                     probabilities)
+    _update_current_delta_probability(list_probabilities, observed, observed_cdf, alleles_probabilities, couples,
+                                      population_amount_calculated,
+                                      probabilities)
     # now keep iterating to fill the list of deltas
     # iterations: 100000
     iterations = 100000
@@ -216,10 +216,10 @@ def perform_experiment(alleles_count,
         # print(f'plus couple to update: {first_couple[1]}, {x}')
         # print(f'minus couple to update: {second_couple[1]}, {y}')
 
-        update_current_delta_probability(list_probabilities, observed, observed_cdf, alleles_probabilities,
-                                         couples,
-                                         population_amount_calculated,
-                                         probabilities)
+        _update_current_delta_probability(list_probabilities, observed, observed_cdf, alleles_probabilities,
+                                          couples,
+                                          population_amount_calculated,
+                                          probabilities)
         # print(observed)
 
     # now we have the list of probabilities. check if 95% of the elements (sum of deltas) are bigger than 1.
@@ -307,7 +307,7 @@ def full_algorithm(observations, should_save_plot=False):
                 mult = 1.0
             probabilities[i, j] = mult * alleles_probabilities[i] * alleles_probabilities[j]
 
-    observed_cdf = calc_observed_cdf(alleles_count, observations)
+    observed_cdf = _calc_observed_cdf(alleles_count, observations)
 
     experiments_amount = 5
     observed_copy = np.copy(observations)
@@ -318,21 +318,21 @@ def full_algorithm(observations, should_save_plot=False):
         if should_save_plot:
             plt.subplot(3, 2, 1)
             result = \
-                perform_experiment(alleles_count=alleles_count,
-                                   population_amount_calculated=population_amount_calculated,
-                                   alleles_probabilities=alleles_probabilities,
-                                   probabilities=probabilities,
-                                   observed=observed_copy,
-                                   observed_cdf=observed_cdf_copy,
-                                   plot_index=experiment_num + 1)
+                _perform_experiment(alleles_count=alleles_count,
+                                    population_amount_calculated=population_amount_calculated,
+                                    alleles_probabilities=alleles_probabilities,
+                                    probabilities=probabilities,
+                                    observed=observed_copy,
+                                    observed_cdf=observed_cdf_copy,
+                                    plot_index=experiment_num + 1)
         else:
             result = \
-                perform_experiment(alleles_count=alleles_count,
-                                   population_amount_calculated=population_amount_calculated,
-                                   alleles_probabilities=alleles_probabilities,
-                                   probabilities=probabilities,
-                                   observed=observed_copy,
-                                   observed_cdf=observed_cdf_copy)
+                _perform_experiment(alleles_count=alleles_count,
+                                    population_amount_calculated=population_amount_calculated,
+                                    alleles_probabilities=alleles_probabilities,
+                                    probabilities=probabilities,
+                                    observed=observed_copy,
+                                    observed_cdf=observed_cdf_copy)
         results.append(result)
         # initialize observed_copy, copy from observed matrix
         np.copyto(observed_copy, observations)

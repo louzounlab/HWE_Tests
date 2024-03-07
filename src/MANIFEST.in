@@ -1,1 +1,1 @@
-include *.csv
+include hwetests/tests/data/*.csv

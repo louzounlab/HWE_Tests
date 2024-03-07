@@ -10,8 +10,8 @@ import seaborn as sns
 
 
 # need to calculate only on the upper triangle because the matrices are symmetric
-def calculate_chi_squared_value(alleles_amount, population_amount_, alleles_probabilities,
-                                observed_probabilities, correction, cutoff):
+def _calculate_chi_squared_value(alleles_amount, population_amount_, alleles_probabilities,
+                                 observed_probabilities, correction, cutoff):
     value = 0.0
     amount_of_small_expected_ = 0
     for row in range(alleles_amount):
@@ -30,14 +30,14 @@ def calculate_chi_squared_value(alleles_amount, population_amount_, alleles_prob
     return value, amount_of_small_expected_
 
 
-def run_experiment(alleles_count, population_amount, alleles_probabilities,
-                   observed_probabilities, correction, var_obs, index_to_allele_, should_save_csv_, cutoff_value_):
-    chi_squared_stat, amount_of_small_expected = calculate_chi_squared_value(alleles_amount=alleles_count,
-                                                                             population_amount_=population_amount,
-                                                                             alleles_probabilities=alleles_probabilities,
-                                                                             observed_probabilities=observed_probabilities,
-                                                                             correction=correction,
-                                                                             cutoff=cutoff_value_)
+def _run_experiment(alleles_count, population_amount, alleles_probabilities,
+                    observed_probabilities, correction, var_obs, index_to_allele_, should_save_csv_, cutoff_value_):
+    chi_squared_stat, amount_of_small_expected = _calculate_chi_squared_value(alleles_amount=alleles_count,
+                                                                              population_amount_=population_amount,
+                                                                              alleles_probabilities=alleles_probabilities,
+                                                                              observed_probabilities=observed_probabilities,
+                                                                              correction=correction,
+                                                                              cutoff=cutoff_value_)
     couples_amount = (alleles_count * (alleles_count + 1)) / 2 - 1
     dof = couples_amount - amount_of_small_expected
 
@@ -91,7 +91,7 @@ def full_algorithm(file_path,
     """
     ASTA Algorithm.
 
-    Performs a modified Chi-Squared statistical test on ambiguous observations.
+    Performs a modified Chi-Squared statistical tests on ambiguous observations.
     :param file_path: A path to a csv file with columns: 1) index or id of a donor (integer or string).
     Assuming columns are separated with , or + and no whitespaces in the csv file. 2) first allele (integer or string).
     3) second allele (integer or string). 4) probability (float).
@@ -103,8 +103,9 @@ def full_algorithm(file_path,
      [first allele, second allele, observed, expected, variance] is saved (named 'alleles_data.csv')
     and if it's a string then a csv with the given string name is saved.
     :param should_save_plot: (optional, default value is False) Either boolean or string, if it's True then
-    a png containing 2 bar plots is saved (named 'alleles_barplot.png') for each allele showing its chi squared statistic over degrees of freedom
-    (summing over the observations only associated with this allele) and -log_10(p_value).
+    an image containing 2 bar plots is saved (named 'alleles_barplot.png') for each allele showing its chi squared statistic over degrees of freedom
+    (summing over the observations only associated with this allele) and -log_10(p_value). If it's a string and ends with '.pdf' then the plot is saved in pdf format.
+    Otherwise, it's saved in png format.
     If it's a string then a csv with the given string name is saved.
     :param title: (optional, default value is '') A string that will be the title of the plot.
     :return: p-value (float), Chi-Squared statistic (float), degrees of freedom (integer). also saves a csv.
@@ -225,20 +226,20 @@ def full_algorithm(file_path,
                     var_value += (a - mean_value) ** 2
                 var_obs[i, j] = var_value
 
-    p_value, chi_squared, dof = run_experiment(alleles_count=alleles_count,
-                                               population_amount=population_amount,
-                                               alleles_probabilities=alleles_probabilities,
-                                               observed_probabilities=observed_probabilities,
-                                               correction=correction,
-                                               var_obs=var_obs,
-                                               index_to_allele_=index_to_allele,
-                                               should_save_csv_=should_save_csv,
-                                               cutoff_value_=cutoff_value)
+    p_value, chi_squared, dof = _run_experiment(alleles_count=alleles_count,
+                                                population_amount=population_amount,
+                                                alleles_probabilities=alleles_probabilities,
+                                                observed_probabilities=observed_probabilities,
+                                                correction=correction,
+                                                var_obs=var_obs,
+                                                index_to_allele_=index_to_allele,
+                                                should_save_csv_=should_save_csv,
+                                                cutoff_value_=cutoff_value)
 
     if should_save_plot:
         # save a bar plot showing for each allele its deviation from HWE
         # couples_amount = int((alleles_count * (alleles_count + 1)) / 2 - 1)
-        df = pd.DataFrame(index=range(alleles_count), columns=['Alleles', 'Normalized Statistic', '-log_10(p_value)'])
+        df = pd.DataFrame(index=range(alleles_count), columns=['Alleles', 'Normalized statistic', '-log_10(p_value)'])
         logs_list = ['s' for _ in range(alleles_count)]
         p_values = [0.0 for _ in range(alleles_count)]
         for i in range(alleles_count):
@@ -310,7 +311,7 @@ def full_algorithm(file_path,
         # move ticks to the right
 
         # plt.subplot(1, 2, 2)
-        fig = plt.figure()
+        # fig = plt.figure()
 
         # making a scatter plot with color bar
         sns.set_style('white')

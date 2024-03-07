@@ -7,7 +7,7 @@ def full_algorithm(file_path, is_first_row_contains_columns_names=False):
     """
     UMAT with sampling algorithm.
 
-    Performs UMAT test on ambiguous observations.
+    Performs UMAT tests on ambiguous observations.
     :param file_path: A path to a csv file with columns: 1) index or id of a donor (integer or string).
     2) first allele (integer or string). 3) second allele (integer or string). 4) probability (float).
     Assuming columns are separated with , or + and no whitespaces in the csv file
