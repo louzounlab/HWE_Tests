@@ -1,9 +1,8 @@
 <p align="center">
     <br>
-    <img src="https://raw.githubusercontent.com/huggingface/diffusers/main/docs/source/en/imgs/diffusers_library.jpg" width="400"/>
+    <img src="https://github.com/louzounlab/HWE_Tests/assets/29067588/1a498787-981d-4bac-b069-a58a6799e2f4" width="400"/>
     <br>
 <p>
-<p align="center">
 <p align="center">
     <a href="https://img.shields.io/badge/python-100%25-blue">
         <img alt="python" src="https://img.shields.io/badge/python-100%25-blue">
@@ -11,11 +10,6 @@
     <a href="https://img.shields.io/badge/license-MIT-blue">
         <img alt="license" src="https://img.shields.io/badge/license-MIT-blue">
     </a>
-
-
-# hwetests
-![Static Badge](https://img.shields.io/badge/python-100%25-blue) ![Static Badge](https://img.shields.io/badge/license-MIT-blue
-)
 
 The Hardy-Weinberg Equilibrium (HWE) assumption is essential to many population genetics models, which assumes that allele pairs from a given population are random. An HWE test needs to test whether the pairing are random or not.
 
