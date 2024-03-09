@@ -106,10 +106,9 @@ def full_algorithm(file_path,
     an image containing 2 bar plots is saved (named 'alleles_barplot.png') for each allele showing its chi squared statistic over degrees of freedom
     (summing over the observations only associated with this allele) and -log_10(p_value). If it's a string and ends with '.pdf' then the plot is saved in pdf format.
     Otherwise, it's saved in png format.
-    If it's a string then a csv with the given string name is saved.
+    If it's a string then a png with the given string name is saved.
     :param title: (optional, default value is '') A string that will be the title of the plot.
-    :return: p-value (float), Chi-Squared statistic (float), degrees of freedom (integer). also saves a csv.
-    with columns: first allele, second allele, observed, variance:
+    :return: p-value (float), Chi-Squared statistic (float), degrees of freedom (integer).
     """
     id_to_index = {}
     allele_to_index = {}

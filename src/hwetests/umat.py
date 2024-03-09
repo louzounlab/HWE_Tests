@@ -105,6 +105,7 @@ alleles probabilities: {alleles_probabilities}''')
 # returns:  result (1 for significance or 0)
 def _perform_experiment(alleles_count,
                         population_amount_calculated, alleles_probabilities, probabilities, observed, observed_cdf,
+                        start_from=30000, iterations=100000,
                         plot_index=0):
     # [ln(p_0), ln(p_1),...,]
     # actually [0, delta_1, delta_2,...,delta_k]
@@ -185,7 +186,6 @@ def _perform_experiment(alleles_count,
                                       probabilities)
     # now keep iterating to fill the list of deltas
     # iterations: 100000
-    iterations = 100000
     # iterations = 5
     for k in range(iterations):
         # updating the couples
@@ -225,7 +225,6 @@ def _perform_experiment(alleles_count,
     # now we have the list of probabilities. check if 95% of the elements (sum of deltas) are bigger than 1.
     sum_current = 0
     bigger_counter = 0
-    start_from = 30000
     # start_from = calculate_start_time(alleles_count=alleles_count,
     #                                                        population_amount=population_amount_calculated,
     #                                                        alleles_probabilities=alleles_probabilities,
@@ -263,7 +262,10 @@ def _perform_experiment(alleles_count,
 
 # here is the full gibbs sampling algorithm.
 # we use the same observations 5 times and return the mean result
-def full_algorithm(observations, should_save_plot=False):
+def full_algorithm(observations,
+                   start_from=30000,
+                   iterations=100000,
+                   should_save_plot=False):
     """
     UMAT Algorithm.
 
@@ -273,6 +275,8 @@ def full_algorithm(observations, should_save_plot=False):
     :param should_save_plot: Either boolean or string, if it's True then plot of the perturbations is saved
     (named 'umat_plot.png')
     and if it's a string then a plot with the given string name is saved.
+    :param start_from: The index to start from when calculating the p-value.
+    :param iterations: The amount of iterations to perform.
     :return: A p-value under the null Hypothesis that observations are distributed around HWE.
     """
     alleles_count = observations.shape[0]
@@ -324,6 +328,8 @@ def full_algorithm(observations, should_save_plot=False):
                                     probabilities=probabilities,
                                     observed=observed_copy,
                                     observed_cdf=observed_cdf_copy,
+                                    start_from=start_from,
+                                    iterations=iterations,
                                     plot_index=experiment_num + 1)
         else:
             result = \
@@ -332,7 +338,9 @@ def full_algorithm(observations, should_save_plot=False):
                                     alleles_probabilities=alleles_probabilities,
                                     probabilities=probabilities,
                                     observed=observed_copy,
-                                    observed_cdf=observed_cdf_copy)
+                                    observed_cdf=observed_cdf_copy,
+                                    start_from=start_from,
+                                    iterations=iterations)
         results.append(result)
         # initialize observed_copy, copy from observed matrix
         np.copyto(observed_copy, observations)

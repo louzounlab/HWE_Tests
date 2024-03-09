@@ -3,16 +3,21 @@ import random
 from . import umat
 
 
-def full_algorithm(file_path, is_first_row_contains_columns_names=False):
+def full_algorithm(file_path,
+                   start_from=30000,
+                   iterations=100000,
+                   is_first_row_contains_columns_names=False):
     """
     UMAT with sampling algorithm.
 
     Performs UMAT tests on ambiguous observations.
     :param file_path: A path to a csv file with columns: 1) index or id of a donor (integer or string).
     2) first allele (integer or string). 3) second allele (integer or string). 4) probability (float).
-    Assuming columns are separated with , or + and no whitespaces in the csv file
+    Assuming columns are separated with , or + and no whitespaces in the csv file.
+    :param start_from: The index to start from when calculating the p-value.
+    :param iterations: The amount of iterations to perform.
     :param is_first_row_contains_columns_names: If True then it is assumed that the first row contains the
-    columns names: i.e. 'column1,column2,...'
+    columns names: i.e. 'column1,column2,...'.
     :return: A p-value under the null Hypothesis that observations are distributed around HWE.
     """
     id_to_index = {}
@@ -107,4 +112,6 @@ def full_algorithm(file_path, is_first_row_contains_columns_names=False):
         # update observations
         observations[i, j] += 1
 
-    return umat.full_algorithm(observations=observations)
+    return umat.full_algorithm(observations=observations,
+                               start_from=start_from,
+                               iterations=iterations)
