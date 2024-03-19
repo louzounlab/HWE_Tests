@@ -1,6 +1,6 @@
 <p align="center">
     <br>
-    <img src="https://github.com/louzounlab/HWE_Tests/assets/29067588/58bff417-6493-4aaa-a435-3b255b6c0319" width="400"/>
+    <img src="https://github.com/louzounlab/HWE_Tests/assets/29067588/58bff417-6493-4aaa-a435-3b255b6c0319" width="300"/>
     <br>
 <p>
 <p align="center">
