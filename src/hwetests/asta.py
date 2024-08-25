@@ -288,10 +288,10 @@ def full_algorithm(file_path,
                 if p_values[i] == 0.0:
                     df.loc[i, '-log_10(p_value)'] = max_log
 
-        # sort dataframe according to p_values and take the smallest 20 statistics.
+        # sort dataframe according to p_values and take the smallest 10 statistics.
         df = df.loc[df['-log_10(p_value)'] != 's']
-        df = df.sort_values('Normalized statistic', ascending=False).head(min(alleles_count, 20))
-        # we need to update the log p-values (some may be infinite, so we set them to the max value from the 20)
+        df = df.sort_values('Normalized statistic', ascending=False).head(min(alleles_count, 10))
+        # we need to update the log p-values (some may be infinite, so we set them to the max value from the 10)
 
         # plot the dataframe into 2 bar plots
         # fig, axes = plt.subplots(1, 2)
@@ -324,6 +324,7 @@ def full_algorithm(file_path,
         # cbar.ax.tick_params(labelsize=15)
         cbar.ax.tick_params(labelsize=5)
         cbar.set_label('-log_10(p_value)', fontsize=7)
+        cbar.set_label('-log_10(p_value)')
         # removing the points from the color bar
         plot.remove()
         if df['-log_10(p_value)'].nunique() == 1:
@@ -338,19 +339,19 @@ def full_algorithm(file_path,
         # fig.tight_layout()
 
         # take care of the font sizes
-        # ax.set_xlabel('Normalized statistic', fontsize=18)
         ax.set_xlabel('Normalized statistic', fontsize=7)
-        # ax.set_ylabel('Alleles', fontsize=18)
+        # ax.set_xlabel('Normalized statistic')
         ax.set_ylabel('Alleles', fontsize=7)
-        # ax.tick_params(labelsize=15)
+        # ax.set_ylabel('Alleles')
         ax.tick_params(labelsize=5)
+        # ax.tick_params(labelsize=5)
         if isinstance(should_save_plot, str):
             file_name = should_save_plot
         else:
             file_name = 'alleles_barplot'
         if title:
-            # plt.title(title, fontsize=20)
             plt.title(title, fontsize=8)
+            # plt.title(title)
         # check whether to save in pdf format or other formats
         if file_name.endswith('.pdf'):
             plt.savefig(file_name, format='pdf', bbox_inches="tight")
