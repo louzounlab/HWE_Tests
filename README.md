@@ -37,9 +37,11 @@ pip install hwetests
 Here we show how to use our package with simulated data given in our package.
 
 ### ASTA test
+
 ```python
-from hwetests import asta
-from hwetests.tests import dataloader
+
+from HWE_Tests.hwetests import asta
+from HWE_Tests.hwetests.tests import dataloader
 
 if __name__ == '__main__':
     # getting the absolute path to the 'ambiguous_data.csv' file
@@ -53,9 +55,11 @@ if __name__ == '__main__':
 ```
 
 ### UMAT test
+
 ```python
-from hwetests import umat
-from hwetests.tests import dataloader
+
+from HWE_Tests.hwetests import umat
+from HWE_Tests.hwetests.tests import dataloader
 import numpy as np
 
 if __name__ == '__main__':
@@ -69,9 +73,11 @@ if __name__ == '__main__':
 ```
 
 ### UMAT with uncertainty test
+
 ```python
-from hwetests import umat_with_uncertainty
-from hwetests.tests import dataloader
+
+from HWE_Tests.hwetests import umat_with_uncertainty
+from HWE_Tests.hwetests.tests import dataloader
 
 if __name__ == '__main__':
     # getting the absolute path to the 'ambiguous_data.csv' file
