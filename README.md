@@ -23,83 +23,13 @@ Both  **ASTA** and **UMAT with sampling** assume ambiguity in the observations w
 ## Table of Contents
 
 -  [Installation](#installation)
--  [Examples](#examples)
 -  [Quick tour](#quick_tour)
+-  [Examples](#examples)
 
 ## Installation
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install hwetests.
 ```bash
 pip install hwetests
-```
-
-## Examples
-
-Here we show how to use our package with simulated data given in our package.
-
-### ASTA test
-
-```python
-
-from HWE_Tests.hwetests import asta
-from HWE_Tests.hwetests.tests import dataloader
-
-if __name__ == '__main__':
-    # getting the absolute path to the 'ambiguous_data.csv' file
-    ambiguous_data_path = dataloader.get_path(is_ambiguous=True)
-    # Perform ASTA
-    p_value, statistic, dof = asta.full_algorithm(file_path=ambiguous_data_path,
-                                                  cutoff_value=4.0)
-    print(f'p-value: {p_value}')
-    print(f'statistic: {statistic}')
-    print(f'degrees of freedom: {dof}')
-```
-
-### UMAT test
-
-```python
-
-from HWE_Tests.hwetests import umat
-from HWE_Tests.hwetests.tests import dataloader
-import numpy as np
-
-if __name__ == '__main__':
-    # getting the absolute path to the 'unambiguous_data.csv' file
-    unambiguous_data_path = dataloader.get_path(is_ambiguous=False)
-    # import data from csv file as a numpy array
-    data = np.genfromtxt(unambiguous_data_path, delimiter=',')
-    # Perform UMAT
-    p_value = umat.full_algorithm(data)
-    print(f'p-value: {p_value}')
-```
-
-### UMAT with uncertainty test
-
-```python
-
-from HWE_Tests.hwetests import umat_with_uncertainty
-from HWE_Tests.hwetests.tests import dataloader
-
-if __name__ == '__main__':
-    # getting the absolute path to the 'ambiguous_data.csv' file
-    ambiguous_data_path = dataloader.get_path(is_ambiguous=True)
-    # Perform UMAT with sampling
-    p_value = umat_with_uncertainty.full_algorithm(file_path='../data/ambiguous_data.csv')
-    print(f'p-value: {p_value}')
-```
-
-You can find the scripts and the simulated data in:
-```bash
-├───src
-│   ├───hwetests
-    │   ├───tests
-    │   │   ├───data
-    │   │   │   └───unambiguous_data.csv # for ASTA and UMAT with sampling (contains 50k population, 20 alleles, 0.2 uncertainty, in HWE)
-    │   │   │   └───ambiguous_data.csv # for UMAT (contains 100k population, in HWE)
-    │   │   ├───scripts
-    │   │   │   └───asta_test.py
-    │   │   │   └───umat_test.py
-    │   │   │   └───umat_with_sampling_test.py
-    │   │   └───dataloader.py
 ```
 
 ## Quick tour
@@ -192,3 +122,73 @@ Where:
 - `iterations`: The amount of iterations to perform.
 
 Returns: A p-value under the null Hypothesis that observations are distributed around HWE.
+
+
+## Examples
+
+Here we show how to use our package with simulated data given in our package.
+
+### ASTA test
+
+```python
+
+from HWE_Tests.hwetests import asta
+from HWE_Tests.hwetests.tests import dataloader
+
+if __name__ == '__main__':
+    # getting the absolute path to the 'ambiguous_data.csv' file
+    ambiguous_data_path = dataloader.get_path(is_ambiguous=True)
+    # Perform ASTA
+    p_value, statistic, dof = asta.full_algorithm(file_path=ambiguous_data_path,
+                                                  cutoff_value=4.0)
+    print(f'p-value: {p_value}')
+    print(f'statistic: {statistic}')
+    print(f'degrees of freedom: {dof}')
+```
+
+### UMAT test
+
+```python
+
+from HWE_Tests.hwetests import umat
+from HWE_Tests.hwetests.tests import dataloader
+import numpy as np
+
+if __name__ == '__main__':
+    # getting the absolute path to the 'unambiguous_data.csv' file
+    unambiguous_data_path = dataloader.get_path(is_ambiguous=False)
+    # import data from csv file as a numpy array
+    data = np.genfromtxt(unambiguous_data_path, delimiter=',')
+    # Perform UMAT
+    p_value = umat.full_algorithm(data)
+    print(f'p-value: {p_value}')
+```
+
+### UMAT with uncertainty test
+
+```python
+
+from HWE_Tests.hwetests import umat_with_uncertainty
+from HWE_Tests.hwetests.tests import dataloader
+
+if __name__ == '__main__':
+    # getting the absolute path to the 'ambiguous_data.csv' file
+    ambiguous_data_path = dataloader.get_path(is_ambiguous=True)
+    # Perform UMAT with sampling
+    p_value = umat_with_uncertainty.full_algorithm(file_path='../data/ambiguous_data.csv')
+    print(f'p-value: {p_value}')
+```
+
+You can find the scripts and the simulated data in:
+```bash
+├───hwetests
+│   ├───tests
+│   │   ├───data
+│   │   │   └───unambiguous_data.csv # for ASTA and UMAT with sampling (contains 50k population, 20 alleles, 0.2 uncertainty, in HWE)
+│   │   │   └───ambiguous_data.csv # for UMAT (contains 100k population, in HWE)
+│   │   ├───scripts
+│   │   │   └───asta_test.py
+│   │   │   └───umat_test.py
+│   │   │   └───umat_with_sampling_test.py
+│   │   └───dataloader.py
+```
