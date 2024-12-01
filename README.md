@@ -25,6 +25,7 @@ Both  **ASTA** and **UMAT with sampling** assume ambiguity in the observations w
 -  [Installation](#installation)
 -  [Quick tour](#quick_tour)
 -  [Examples](#examples)
+-  [Working with freqs files](#working_with_freqs_files)
 
 ## Installation
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install hwetests.
@@ -192,3 +193,48 @@ You can find the scripts and the simulated data in:
 │   │   │   └───umat_with_sampling_test.py
 │   │   └───dataloader.py
 ```
+
+## Working with freqs files
+If you want to directly work with freqs files, that should be of the form:
+```csv
+553,A*01:01~B*49:01~C*07:01~DQB1*02:01~DRB1*07:01+A*03:01~B*07:02~C*07:02~DQB1*03:01~DRB1*11:04,8.807681966366988e-06,0
+553,A*03:01~B*49:01~C*07:01~DQB1*02:01~DRB1*07:01+A*01:01~B*07:02~C*07:02~DQB1*03:01~DRB1*11:04,2.7491553814098375e-07,1
+553,A*03:01~B*07:02~C*07:02~DQB1*02:01~DRB1*07:01+A*01:01~B*49:01~C*07:01~DQB1*03:01~DRB1*11:04,1.2764664565168216e-08,2
+207,A*01:01~B*58:01~C*07:01~DQB1*02:01~DRB1*07:01+A*02:01~B*38:01~C*12:03~DQB1*06:03~DRB1*13:01,1.682524331112655e-05,0
+```
+Notice that the last value is the person index. The person index is 0 if it's the first time we see this person.
+Also, it is assumed that the same ids are grouped together.
+
+You can run ASTA on such a file, using this simple code:
+```python
+import os
+import pandas as pd
+from HWE_Tests.hwetests import asta
+from HWE_Tests.hwetests.tests import utils
+from matplotlib import pyplot as plt
+
+
+if __name__ == '__main__':
+    # path to the freqs file
+    data_file_path = '../data/data.freqs'
+    # A directory path (including the name of the directory) of where you want to store all the results and plots
+    directory_path = 'my_directory'
+
+    utils.save_plots_and_data(data_file_path, directory_path)
+```
+After performing the above code, you will find the results in the directory you specified. The results will be stored in the form:
+```bash
+├───my_directory
+│   ├───levels
+│   ├───plots  # here you can find all the plots, each level (A, B, C, DQB1, DRB1) has its own plot
+│   ├───races
+│   ├───results  # here you can find the dof, p_value, statistic for each level
+```
+
+An example of a plot for the level DQB1:
+<p align="center">
+    <br>
+    <img src="https://github.com/user-attachments/assets/ce625878-cd3f-4bc1-8b49-5b6f7e4dcd24" width="500"/>
+    <br>
+<p>
+
