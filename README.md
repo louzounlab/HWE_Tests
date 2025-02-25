@@ -133,8 +133,8 @@ Here we show how to use our package with simulated data given in our package.
 
 ```python
 
-from HWE_Tests.hwetests import asta
-from HWE_Tests.hwetests.tests import dataloader
+from hwetests import asta
+from hwetests.tests import dataloader
 
 if __name__ == '__main__':
     # getting the absolute path to the 'ambiguous_data.csv' file
@@ -151,8 +151,8 @@ if __name__ == '__main__':
 
 ```python
 
-from HWE_Tests.hwetests import umat
-from HWE_Tests.hwetests.tests import dataloader
+from hwetests import umat
+from hwetests.tests import dataloader
 import numpy as np
 
 if __name__ == '__main__':
@@ -169,8 +169,8 @@ if __name__ == '__main__':
 
 ```python
 
-from HWE_Tests.hwetests import umat_with_uncertainty
-from HWE_Tests.hwetests.tests import dataloader
+from hwetests import umat_with_uncertainty
+from hwetests.tests import dataloader
 
 if __name__ == '__main__':
     # getting the absolute path to the 'ambiguous_data.csv' file
@@ -209,8 +209,8 @@ You can run ASTA on such a file, using this simple code:
 ```python
 import os
 import pandas as pd
-from HWE_Tests.hwetests import asta
-from HWE_Tests.hwetests.tests import utils
+from hwetests import asta
+from hwetests.tests import utils
 from matplotlib import pyplot as plt
 
 
