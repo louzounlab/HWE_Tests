@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-from HWE_Tests.hwetests import asta
+from hwetests import asta
 from matplotlib import pyplot as plt
 
 ################## CONSTANTS ##################

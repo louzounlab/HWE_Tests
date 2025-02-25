@@ -1,7 +1,7 @@
 import os
 import pandas as pd
-from HWE_Tests.hwetests import asta
-from HWE_Tests.hwetests.tests import utils
+from hwetests import asta
+from hwetests.tests import utils
 from matplotlib import pyplot as plt
 
 

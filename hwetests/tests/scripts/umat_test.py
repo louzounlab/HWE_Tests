@@ -1,5 +1,5 @@
-from HWE_Tests.hwetests import umat
-from HWE_Tests.hwetests.tests import dataloader
+from hwetests import umat
+from hwetests.tests import dataloader
 import numpy as np
 
 if __name__ == '__main__':
