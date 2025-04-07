@@ -1,5 +1,5 @@
-from HWE_Tests.hwetests import umat_with_uncertainty
-from HWE_Tests.hwetests.tests import dataloader
+from hwetests import umat_with_uncertainty
+from hwetests.tests import dataloader
 
 if __name__ == '__main__':
     # getting the absolute path to the 'ambiguous_data.csv' file

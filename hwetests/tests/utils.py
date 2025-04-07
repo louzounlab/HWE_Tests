@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-from HWE_Tests.hwetests import asta
+from hwetests import asta
 from matplotlib import pyplot as plt
 
 ################## CONSTANTS ##################
@@ -291,3 +291,5 @@ def save_plots_and_data(data_file_path: str, directory_path: str = ''):
     # save results for each level
     _save_results(directory_path=directory_path)
     print("Results saved successfully")
+
+

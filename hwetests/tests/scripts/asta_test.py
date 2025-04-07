@@ -1,5 +1,5 @@
-from HWE_Tests.hwetests import asta
-from HWE_Tests.hwetests.tests import dataloader
+from hwetests import asta
+from hwetests.tests import dataloader
 
 if __name__ == '__main__':
     # getting the absolute path to the 'ambiguous_data.csv' file
