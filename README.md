@@ -209,7 +209,7 @@ You can run ASTA on such a file, using this simple code:
 ```python
 import os
 import pandas as pd
-from HWE_Tests.hwetests import asta
+from hwetests import asta
 from hwetests.tests import utils
 from matplotlib import pyplot as plt
 
